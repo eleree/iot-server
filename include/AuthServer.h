@@ -31,17 +31,22 @@ public:
 	int32_t start(void);
 	int32_t stop(void);
 	static void listener_cb(struct evconnlistener *, evutil_socket_t,struct sockaddr *, int socklen, void *);
+	static void conn_readcb(struct bufferevent *, void *);
 	static void conn_writecb(struct bufferevent *, void *);
 	static void conn_eventcb(struct bufferevent *, short, void *);
 	static void signal_cb(evutil_socket_t, short, void *);
 	void run();
 private:
+	pthread_mutex_t _mutex;
+
 	struct event_base * _base;
 	struct evconnlistener * _listener;
 	struct event * _signal_event;
 
 	struct sockaddr_in _sin;
 	Thread _thread;
+	bool _stopped;
+
 };
 
 #endif

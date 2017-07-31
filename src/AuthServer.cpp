@@ -2,25 +2,27 @@
 
 #pragma warning( disable : 4996)
 
-AuthServer::AuthServer()
+AuthServer::AuthServer():_stopped(true)
 {
+	pthread_mutex_init(&_mutex, NULL);
 
 }
 
 AuthServer::~AuthServer()
 {
-
+	pthread_mutex_destroy(&_mutex);
 }
 
 int32_t AuthServer::start(void)
 {
 	_thread.start(*this);
+	_stopped = false;
 	return 0;
 }
 
 int32_t AuthServer::stop(void)
-{
-	return 0;
+{	
+	return event_base_loopbreak(_base);	
 }
 
 #define MESSAGE "hello world\n"
@@ -36,20 +38,29 @@ void AuthServer::listener_cb(struct evconnlistener *listener, evutil_socket_t fd
 		event_base_loopbreak(base);
 		return;
 	}
-	bufferevent_setcb(bev, NULL, conn_writecb, conn_eventcb, NULL);
-	bufferevent_enable(bev, EV_WRITE);
-	bufferevent_disable(bev, EV_READ);
+	bufferevent_setcb(bev, conn_readcb, conn_writecb, conn_eventcb, NULL);
+	bufferevent_enable(bev, EV_WRITE|EV_READ);
 
 	bufferevent_write(bev, MESSAGE, strlen(MESSAGE));
 }
 
+void AuthServer::conn_readcb(struct bufferevent *bev, void *user_data)
+{
+	char buf[1024];
+	int n;
+	struct evbuffer *input = bufferevent_get_input(bev);
+	while ((n = evbuffer_remove(input, buf, sizeof(buf))) > 0) {
+		//fwrite(buf, 1, n, stdout);
+		bufferevent_write(bev, buf, n);
+	}
+}
 
 void AuthServer::conn_writecb(struct bufferevent *bev, void *user_data)
 {
 	struct evbuffer *output = bufferevent_get_output(bev);
 	if (evbuffer_get_length(output) == 0) {
 		printf("flushed answer\n");
-		bufferevent_free(bev);
+		//bufferevent_free(bev);
 	}
 }
 
@@ -106,10 +117,12 @@ void AuthServer::run(void)
 	}
 
 	event_base_dispatch(_base);
-
+	
 	evconnlistener_free(_listener);
 	event_free(_signal_event);
 	event_base_free(_base);
+
+	_stopped = true;
 
 	return;
 }
