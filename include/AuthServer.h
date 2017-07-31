@@ -20,7 +20,10 @@
 #include <event2/util.h>
 #include <event2/event.h>
 
-class AuthServer
+#include "Runnable.h"
+#include "Thread.h"
+
+class AuthServer:  Runnable
 {
 public:
 	AuthServer();
@@ -31,12 +34,14 @@ public:
 	static void conn_writecb(struct bufferevent *, void *);
 	static void conn_eventcb(struct bufferevent *, short, void *);
 	static void signal_cb(evutil_socket_t, short, void *);
+	void run();
 private:
 	struct event_base * _base;
 	struct evconnlistener * _listener;
 	struct event * _signal_event;
 
 	struct sockaddr_in _sin;
+	Thread _thread;
 };
 
 #endif

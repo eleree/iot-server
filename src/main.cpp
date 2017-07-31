@@ -23,17 +23,8 @@ Where possible, it exits cleanly in response to a SIGINT (ctrl-c).
 
 #include <event2/event-config.h>
 
-void *func(void *arg)
-{
-	printf("this is a new thread\r\n");
-	return NULL;
-}
-
 int main(int argc, char **argv)
 {
-	pthread_t threadId;
-	pthread_create(&threadId, NULL, func, NULL);
-	pthread_create(&threadId, NULL, func, NULL);
 #ifdef _WIN32
 	WSADATA wsa_data;
 	WSAStartup(0x0201, &wsa_data);

@@ -14,37 +14,7 @@ AuthServer::~AuthServer()
 
 int32_t AuthServer::start(void)
 {
-	_base = event_base_new();
-	if (!_base) {
-		fprintf(stderr, "Could not initialize libevent!\n");
-	}
-	memset(&_sin, 0, sizeof(_sin));
-	_sin.sin_family = AF_INET;
-	_sin.sin_port = htons(9995);
-
-	_listener = evconnlistener_new_bind(_base, listener_cb, (void *)_base,
-		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1,
-		(struct sockaddr*)&_sin,
-		sizeof(_sin));
-
-	if (!_listener) {
-		fprintf(stderr, "Could not create a listener!\n");
-		return 1;
-	}
-
-	_signal_event = evsignal_new(_base, SIGINT, signal_cb, (void *)_base);
-
-	if (!_signal_event || event_add(_signal_event, NULL)<0) {
-		fprintf(stderr, "Could not create/add a signal event!\n");
-		return 1;
-	}
-
-	event_base_dispatch(_base);
-
-	evconnlistener_free(_listener);
-	event_free(_signal_event);
-	event_base_free(_base);
-
+	_thread.start(*this);
 	return 0;
 }
 
@@ -105,4 +75,41 @@ void AuthServer::signal_cb(evutil_socket_t sig, short events, void *user_data)
 	printf("Caught an interrupt signal; exiting cleanly in two seconds.\n");
 
 	event_base_loopexit(base, &delay);
+}
+
+
+void AuthServer::run(void)
+{
+	_base = event_base_new();
+	if (!_base) {
+		fprintf(stderr, "Could not initialize libevent!\n");
+	}
+	memset(&_sin, 0, sizeof(_sin));
+	_sin.sin_family = AF_INET;
+	_sin.sin_port = htons(9995);
+
+	_listener = evconnlistener_new_bind(_base, listener_cb, (void *)_base,
+		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1,
+		(struct sockaddr*)&_sin,
+		sizeof(_sin));
+
+	if (!_listener) {
+		fprintf(stderr, "Could not create a listener!\n");
+		return ;
+	}
+
+	_signal_event = evsignal_new(_base, SIGINT, signal_cb, (void *)_base);
+
+	if (!_signal_event || event_add(_signal_event, NULL)<0) {
+		fprintf(stderr, "Could not create/add a signal event!\n");
+		return;
+	}
+
+	event_base_dispatch(_base);
+
+	evconnlistener_free(_listener);
+	event_free(_signal_event);
+	event_base_free(_base);
+
+	return;
 }

@@ -116,12 +116,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\public\Runnable.cpp" />
+    <ClCompile Include="include\public\Thread.cpp" />
     <ClCompile Include="src\AuthServer.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AuthServer.h" />
     <ClInclude Include="include\public\Runnable.h" />
+    <ClInclude Include="include\public\Thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
