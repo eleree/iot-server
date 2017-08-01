@@ -75,11 +75,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\public;$(ProjectDir)include\pthread;$(ProjectDir)include\libevent;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include\mysql;$(ProjectDir)include\public;$(ProjectDir)include\pthread;$(ProjectDir)include\libevent;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)lib\pthread\pthreadVC2.lib;$(ProjectDir)lib\libevent\event_extra.lib;D:\OpenSSL-Win32\lib\VC\libssl32MD.lib;D:\OpenSSL-Win32\lib\VC\libcrypto32MD.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)lib\mysql\libmysql.lib;$(ProjectDir)lib\pthread\pthreadVC2.lib;$(ProjectDir)lib\libevent\event_extra.lib;D:\OpenSSL-Win32\lib\VC\libssl32MD.lib;D:\OpenSSL-Win32\lib\VC\libcrypto32MD.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -96,6 +97,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -120,11 +122,17 @@
     <ClCompile Include="include\public\Thread.cpp" />
     <ClCompile Include="src\AuthServer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SQLConnection.cpp" />
+    <ClCompile Include="src\SQLConnectionFactory.cpp" />
+    <ClCompile Include="src\SQLConnectionPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AuthServer.h" />
     <ClInclude Include="include\public\Runnable.h" />
     <ClInclude Include="include\public\Thread.h" />
+    <ClInclude Include="include\SQLConnection.h" />
+    <ClInclude Include="include\SQLConnectionPool.h" />
+    <ClInclude Include="include\SQLConnectionFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

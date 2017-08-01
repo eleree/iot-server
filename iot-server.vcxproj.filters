@@ -27,6 +27,15 @@
     <ClCompile Include="include\public\Runnable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\SQLConnectionFactory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SQLConnectionPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SQLConnection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AuthServer.h">
@@ -36,6 +45,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\public\Thread.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SQLConnectionPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SQLConnectionFactory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SQLConnection.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

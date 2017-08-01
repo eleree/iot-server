@@ -10,6 +10,7 @@ Where possible, it exits cleanly in response to a SIGINT (ctrl-c).
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string>
 #ifndef _WIN32
 #include <netinet/in.h>
 # ifdef _XOPEN_SOURCE_EXTENDED
@@ -18,11 +19,15 @@ Where possible, it exits cleanly in response to a SIGINT (ctrl-c).
 #include <sys/socket.h>
 #endif
 
-#include "AuthServer.h"
 #include "pthread.h"
+
+#include "AuthServer.h"
+#include "SQLConnection.h"
+
 
 #include <event2/event-config.h>
 
+using namespace std;
 int main(int argc, char **argv)
 {
 #ifdef _WIN32
