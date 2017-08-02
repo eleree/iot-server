@@ -75,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\mysql;$(ProjectDir)include\public;$(ProjectDir)include\pthread;$(ProjectDir)include\libevent;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)lib\json;$(ProjectDir)include\json;$(ProjectDir)include\mysql;$(ProjectDir)include\public;$(ProjectDir)include\pthread;$(ProjectDir)include\libevent;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -120,6 +120,9 @@
   <ItemGroup>
     <ClCompile Include="include\public\Runnable.cpp" />
     <ClCompile Include="include\public\Thread.cpp" />
+    <ClCompile Include="lib\json\json_reader.cpp" />
+    <ClCompile Include="lib\json\json_value.cpp" />
+    <ClCompile Include="lib\json\json_writer.cpp" />
     <ClCompile Include="src\AuthServer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\SQLConnection.cpp" />

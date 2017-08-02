@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\jsoncpp">
+      <UniqueIdentifier>{5155c240-4dd1-488e-a180-eeccb922a437}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -35,6 +38,15 @@
     </ClCompile>
     <ClCompile Include="src\SQLConnection.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\json\json_reader.cpp">
+      <Filter>源文件\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\json\json_value.cpp">
+      <Filter>源文件\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\json\json_writer.cpp">
+      <Filter>源文件\jsoncpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
