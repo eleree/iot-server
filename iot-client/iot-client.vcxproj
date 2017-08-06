@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{1CCAD322-89EF-4104-9265-CBB477E6E688}</ProjectGuid>
-    <RootNamespace>iotserver</RootNamespace>
+    <ProjectGuid>{6D6CAC72-8D2D-4B4C-A5E8-FEEFF799CE36}</ProjectGuid>
+    <RootNamespace>iotclient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -75,13 +75,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)lib\json;$(ProjectDir)include\json;$(ProjectDir)include\mysql;$(ProjectDir)include\public;$(ProjectDir)include\pthread;$(ProjectDir)include\libevent;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\2017\iot\iot-server\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>$(ProjectDir)lib\mysql\libmysql.lib;$(ProjectDir)lib\pthread\pthreadVC2.lib;$(ProjectDir)lib\libevent\event_extra.lib;D:\OpenSSL-Win32\lib\VC\libssl32MD.lib;D:\OpenSSL-Win32\lib\VC\libcrypto32MD.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -97,7 +92,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -118,26 +112,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\public\Runnable.cpp" />
-    <ClCompile Include="include\public\Thread.cpp" />
-    <ClCompile Include="lib\json\json_reader.cpp" />
-    <ClCompile Include="lib\json\json_value.cpp" />
-    <ClCompile Include="lib\json\json_writer.cpp" />
-    <ClCompile Include="src\AuthServer.cpp" />
+    <ClCompile Include="..\lib\json\json_reader.cpp" />
+    <ClCompile Include="..\lib\json\json_value.cpp" />
+    <ClCompile Include="..\lib\json\json_writer.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\SQLConnection.cpp" />
-    <ClCompile Include="src\SQLConnectionFactory.cpp" />
-    <ClCompile Include="src\SQLConnectionPool.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\AuthServer.h" />
-    <ClInclude Include="include\Object.h" />
-    <ClInclude Include="include\public\Runnable.h" />
-    <ClInclude Include="include\public\Thread.h" />
-    <ClInclude Include="include\RequestMessage.h" />
-    <ClInclude Include="include\SQLConnection.h" />
-    <ClInclude Include="include\SQLConnectionPool.h" />
-    <ClInclude Include="include\SQLConnectionFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

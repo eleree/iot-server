@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	WSAStartup(0x0201, &wsa_data);
 #endif
 
-	printf("starting iot server...\n");
+	printf("\"starting iot server...\"\n");
 	AuthServer authServer;
 	authServer.start();
 

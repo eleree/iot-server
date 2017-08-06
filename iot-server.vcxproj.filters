@@ -68,5 +68,11 @@
     <ClInclude Include="include\SQLConnection.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\Object.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RequestMessage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
