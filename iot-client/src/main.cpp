@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
+#include "RequestMessage.h"
 using namespace std;
 class TestClass
 {
@@ -45,5 +45,7 @@ int main(void)
 	TestClass rClass;
 	obj.convert(rClass);
 
+	RequestMessage requestMessage("token", "192.168.1.1", "192.168.2.1", "GetDeviceList", "void");
+	requestMessage.serializeToBytes(NULL);
 	return 0;
 }
