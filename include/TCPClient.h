@@ -13,6 +13,7 @@ class TCPClient
 public:
 	TCPClient(string serverAddr, uint16_t port, uint32_t timeout)
 	{
+		_isConnected = false;
 		_port = port;
 		_serverAddr = serverAddr;
 		memset(&_address, 0, sizeof(_address));
@@ -46,6 +47,7 @@ public:
 		if (bufferevent_socket_connect(_conn, (struct sockaddr*)&_address, sizeof(_address)) == 0)
 		{
 			printf("connect success\n");
+			_isConnected = true;
 			return 0;
 		}
 
@@ -58,7 +60,8 @@ public:
 		bufferevent_enable(_conn, EV_WRITE);
 		setTimeout(&_writeTimeout, timeout);
 		bufferevent_set_timeouts(_conn, &_readTimeout, &_writeTimeout);
-		bufferevent_write(_conn, data, length);		
+		bufferevent_write(_conn, data, length);	
+		event_base_loopexit(_base, &_writeTimeout);
 		event_base_dispatch(_base);
 		return 0;
 	}
@@ -72,6 +75,7 @@ public:
 		bufferevent_set_timeouts(_conn, &_readTimeout, &_writeTimeout);
 		event_base_loopexit(_base, &_readTimeout);
 		event_base_dispatch(_base);
+		bufferevent_enable(_conn, EV_WRITE);
 		return targetLen - _readLength;
 	}
 
@@ -80,37 +84,52 @@ public:
 		return 0;
 	}
 
-	int32_t isConnected(void);
+	int32_t isConnected(void)
+	{
+		return _isConnected;
+	}
 
 	static void conn_readcb(struct bufferevent *bev, void *user_data)
 	{
 		int32_t readLen = 0;
 		TCPClient * client = (TCPClient *)user_data;
-		printf("read_cb\r\n");
 
-		while (client->_readLength > 0)
+		if (client->_readLength > 0)
 		{
 			readLen = bufferevent_read(client->_conn, client->_buffer, client->_readLength);
 			if (readLen < 0)
 			{
-				event_base_loopexit(client->_base, NULL);
+				event_base_loopbreak(client->_base);
 				return;
 			}
 			client->_readLength -= readLen;
+			client->_buffer += readLen;
+			if (client->_readLength == 0) {
+				event_base_loopbreak(client->_base);
+				return;
+			}
+		}else{
+			event_base_loopbreak(client->_base);
+			return;
 		}
-
-		printf("readlen %d\r\n", client->_readLength);
-		event_base_loopexit(client->_base, NULL);
 	}
 
 	static void conn_writecb(struct bufferevent *bev, void *user_data)
 	{
-		printf("write_cb\r\n");
+		//printf("write_cb\r\n");
 	}
 
 	static void conn_eventcb(struct bufferevent *bev, short events, void *user_data)
 	{
 		printf("libevent callback %d\n", events);
+		TCPClient * client = (TCPClient *)user_data;
+		if (events & BEV_EVENT_EOF)
+		{
+			printf("socket is closed\r\n");
+			event_base_loopbreak(client->_base);
+			client->_isConnected = false;
+			return;
+		}
 	}
 
 private:

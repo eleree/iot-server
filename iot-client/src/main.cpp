@@ -41,7 +41,7 @@ public:
 
 int main(void)
 {
-	char buffer[100];
+	char buffer[101] = { 0 };
 
 #ifdef _WIN32
 	WSADATA wsa_data;
@@ -59,8 +59,14 @@ int main(void)
 	printf("Write Data\r\n");
 	client.write(binaryArray.first, binaryArray.second, 5000);
 	printf("Read Data\r\n");
+	time_t nowtime;
+	nowtime = time(NULL); //获取当前时间  
+	cout << nowtime << endl;
 	client.read((uint8_t*)buffer, 100, 10000);
-
+	nowtime = time(NULL); //获取当前时间  
+	cout << nowtime << endl;
+	cout << buffer << endl;
+	client.write(binaryArray.first, binaryArray.second, 5000);
 	return 0;
 
 
