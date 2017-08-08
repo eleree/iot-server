@@ -26,7 +26,7 @@ public:
 
 		return 0;
 	}
-
+	/*
 	int32_t serializeToBytes(uint8_t * data)
 	{
 		msgpack::sbuffer sbuf;
@@ -35,13 +35,35 @@ public:
 		msgpack::object_handle oh =
 			msgpack::unpack(sbuf.data(), sbuf.size());
 
+		for (uint8_t i = 0; i < sbuf.size(); i++)
+		{
+			printf("%02x ", (uint8_t)sbuf.data()[i]);
+		}
 		// print the deserialized object.
 		msgpack::object obj = oh.get();
 		std::cout << obj << std::endl;
-
 		return 0;
-	}
+	}*/
 
+	pair<uint8_t *, int32_t> serializeToBytes(void)
+	{
+		pair<uint8_t *, int32_t> binaryArray;
+		msgpack::sbuffer sbuf;
+		msgpack::pack(sbuf, *this);
+
+		
+		binaryArray.first = (uint8_t *)calloc(sbuf.size() + 3, 1);
+		binaryArray.second = sbuf.size()+3;
+
+		memcpy(binaryArray.first + 3, sbuf.data(), sbuf.size());
+
+		for (uint8_t i = 0; i < binaryArray.second; i++)
+		{
+			printf("%02x ", (uint8_t)binaryArray.first[i]);
+		}
+
+		return binaryArray;
+	}
 };
 
 

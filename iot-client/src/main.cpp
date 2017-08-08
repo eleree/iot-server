@@ -1,9 +1,23 @@
+#pragma warning( disable : 4996)
+
 #include <msgpack.hpp>
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include "RequestMessage.h"
+
+#include <event2/event.h>
+#include <event2/bufferevent.h>
+#include <event2/buffer.h>
+#ifndef _WIN32
+#include <netinet/in.h>
+# ifdef _XOPEN_SOURCE_EXTENDED
+#  include <arpa/inet.h>
+# endif
+#include <sys/socket.h>
+#endif
+
 using namespace std;
 class TestClass
 {
@@ -27,25 +41,54 @@ public:
 
 int main(void)
 {
-	TestClass testClass;
-
-	// serialize it into simple buffer.
-	msgpack::sbuffer sbuf;
-	msgpack::pack(sbuf, testClass);
-
-	// deserialize it.
-	msgpack::object_handle oh =
-		msgpack::unpack(sbuf.data(), sbuf.size());
-
-	// print the deserialized object.
-	msgpack::object obj = oh.get();
-	std::cout << obj << std::endl; 
-
-	// convert it into statically typed object.
-	TestClass rClass;
-	obj.convert(rClass);
+#ifdef _WIN32
+	WSADATA wsa_data;
+	WSAStartup(0x0201, &wsa_data);
+#endif
+	pair<uint8_t *, int32_t> binaryArray;
 
 	RequestMessage requestMessage("token", "192.168.1.1", "192.168.2.1", "GetDeviceList", "void");
-	requestMessage.serializeToBytes(NULL);
+	binaryArray = requestMessage.serializeToBytes();
+
+	printf("%d %d\n", (uint32_t)binaryArray.first, binaryArray.second);
+
+	// build socket
+	int port = 8080;
+	struct sockaddr_in my_address;
+	memset(&my_address, 0, sizeof(my_address));
+	my_address.sin_family = AF_INET;
+	inet_pton(AF_INET, "192.168.56.1", &my_address.sin_addr);
+	my_address.sin_port = htons(port);
+
+	// build event base
+	struct event_base* base = event_base_new();
+
+	// set TCP_NODELAY to let data arrive at the server side quickly
+	evutil_socket_t fd;
+	fd = socket(AF_INET, SOCK_STREAM, 0);
+	struct bufferevent* conn = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
+	int enable = 1;
+	if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (char*)&enable, sizeof(enable)) < 0)
+		printf("ERROR: TCP_NODELAY SETTING ERROR!\n");
+	//bufferevent_setcb(conn, NULL, NULL, NULL, NULL); // For client, we don't need callback function
+	bufferevent_enable(conn, EV_WRITE);
+	if (bufferevent_socket_connect(conn, (struct sockaddr*)&my_address, sizeof(my_address)) == 0)
+		printf("connect success\n");
+
+	// start to send data
+	bufferevent_write(conn, binaryArray.first, binaryArray.second);
+	// check the output evbuffer
+	struct evbuffer* output = bufferevent_get_output(conn);
+	int len = 0;
+	len = evbuffer_get_length(output);
+	printf("output buffer has %d bytes left\n", len);
+
+	event_base_dispatch(base);
+
+	bufferevent_free(conn);
+	event_base_free(base);
+
+	free(binaryArray.first);
+
 	return 0;
 }
