@@ -74,5 +74,8 @@
     <ClInclude Include="include\RequestMessage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\TCPClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

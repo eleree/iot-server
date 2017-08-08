@@ -138,6 +138,7 @@
     <ClInclude Include="include\SQLConnection.h" />
     <ClInclude Include="include\SQLConnectionPool.h" />
     <ClInclude Include="include\SQLConnectionFactory.h" />
+    <ClInclude Include="include\TCPClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
