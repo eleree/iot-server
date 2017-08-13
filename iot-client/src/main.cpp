@@ -59,19 +59,29 @@ int main(void)
 	EventBase eventbase;
 	eventbase.startLoopThread();
 	BlockingSocket socket(&eventbase, "192.168.56.1", 8080);
-	socket.connect();
 
-	Sleep(3 * 1000);
+	if (socket.connect() < 0 )
+	{
+		printf("connect to server failed\r\n");
+		eventbase.stop();
+		socket.close();
+		std::getchar();
+		return -1;
+	}
+
+	//Sleep(3 * 1000);
 
 	printf("Start reading \r\n");
 
+	socket.write(binaryArray.first, binaryArray.second);
 	int32_t readLen = 0;
 	readLen = socket.read(buffer, 100, 10000);
-
+	
 	printf("Len:%d, %s",readLen, buffer);
 	printf("End reading\r\n");
-	free(binaryArray.first);
 
 	std::getchar();
+	socket.close();
+	eventbase.stop();
 	return 0;
 }

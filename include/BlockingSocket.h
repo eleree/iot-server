@@ -9,26 +9,19 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-
 using namespace std;
-
-class BlockingSocket;
-
-struct ReadEventRequest
-{
-	uint8_t * data;
-	size_t * len;
-	bufferevent * conn;
-
-	struct event* timeoutEvent;
-	struct timeval tv;
-
-	BlockingSocket * socket;
-};
 
 class BlockingSocket
 {
 public:
+	enum {
+		SOCKET_STATUS_ERROR = -3,
+		SOCKET_STATUS_TIMEOUT = -2,
+		SOCKET_STATUS_DISCONNECTED = -1,
+		SOCKET_STATUS_OK = 0,
+		SOCKET_STATUS_CONNECTED = 1
+	};
+
 	BlockingSocket(EventBase * eventBase,  string serverAddr, uint16_t port)
 	{
 		pthread_mutex_init(&_mutex, NULL);
@@ -53,23 +46,36 @@ public:
 		int enable = 1;
 		if (setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char*)&enable, sizeof(enable)) < 0)
 			printf("ERROR: TCP_NODELAY SETTING ERROR!\n");
-		//bufferevent_setcb(conn, NULL, NULL, NULL, NULL); // For client, we don't need callback function
+
+#if 1
+		int rc = ::connect(_fd, (struct sockaddr*)&_address, sizeof(_address));
+		if (rc == SOCKET_ERROR)
+		{
+			printf("connect socket error\r\n");
+			return SOCKET_STATUS_ERROR;
+		}
+
+		_connected = SOCKET_STATUS_CONNECTED;
+
+		return SOCKET_STATUS_OK;
+#else
 		if (bufferevent_socket_connect(_conn, (struct sockaddr*)&_address, sizeof(_address)) == 0)
 		{
-			printf("connect success\n");
-			//_isConnected = true;
 			return 0;
 		}
+#endif
 		return -1;
 	}
 
 	int32_t write(uint8_t const* buf, size_t len) 
 	{
-		return 0;
-	}
+		if (_connected != SOCKET_STATUS_CONNECTED)
+			return SOCKET_STATUS_DISCONNECTED;
 
-	static void timeoutEventHandler(int fd, short event, void* arg) 
-	{
+		if (bufferevent_write(_conn, buf, len) == 0)
+			return len;
+		else
+			return SOCKET_STATUS_ERROR;
 	}
 
 	int32_t read(uint8_t* buf, size_t len, uint32_t timeout)
@@ -79,8 +85,6 @@ public:
 		ts.tv_sec = timeout / 1000 + time(NULL);
 		ts.tv_nsec = (timeout % 1000) * 1000 * 1000;
 
-		ReadEventRequest readRequest;
-		readRequest.socket = this;
 		pthread_mutex_lock(&_mutex);
 
 		struct evbuffer *buffer = bufferevent_get_input(_conn);
@@ -99,37 +103,50 @@ public:
 			len -= length;
 		}
 
-		//readRequest.timeoutEvent =  evtimer_new(_eventBase->getEventBase(), timeoutEventHandler, &readRequest);
-		//evtimer_add(readRequest.timeoutEvent, &readRequest.tv);
-
-		/* Blocking Here */
+		/* blocking here, we may not be signaled after timeout, so we read buffer once before exit loop */
 		bufferevent_enable(_conn, EV_READ | EV_WRITE);
 		while (len != 0)
 		{
 			int ret = pthread_cond_timedwait(&_rcond, &_mutex, &ts);
+			length = evbuffer_get_length(buffer);
+			bufferevent_read(_conn, buf, MIN(length, len));
+			buf += MIN(length, len);
+			len -= MIN(length, len);
 			if (ret == ETIMEDOUT)
 			{
-				pthread_mutex_unlock(&_mutex);
-				return targetLen - len;
-			}else{
-				length = evbuffer_get_length(buffer);
-				bufferevent_read(_conn, buf, MIN(length,len));
-				buf += MIN(length, len);
-				len -= MIN(length, len);
-			}
+				break;
+			}						
 			printf("len %d\r\n", len);
 		}
 		bufferevent_enable(_conn, EV_WRITE);
 		pthread_mutex_unlock(&_mutex);
-		return targetLen;
+
+		if (_connected != SOCKET_STATUS_CONNECTED)
+			return SOCKET_STATUS_DISCONNECTED;
+
+		return targetLen - len;
 	}
 
-	int32_t write(uint8_t const* buf, size_t len, uint32_t timeou)
+	int32_t write(uint8_t const* buf, size_t len, uint32_t timeout)
 	{
-		return 0;
+		return bufferevent_write(_conn, buf, len);
+	}
+
+	void close(void)
+	{
+#ifdef _WIN32
+		::closesocket(_fd);
+#else
+		close(fd);
+#endif
+		bufferevent_free(_conn);
+		pthread_mutex_destroy(&_mutex);
+		pthread_cond_destroy(&_rcond);
+		pthread_cond_destroy(&_wcond);
 	}
 
 private:
+	int32_t _connected;
 	EventBase * _eventBase;
 	evutil_socket_t _fd;
 	bufferevent * _conn;
@@ -143,7 +160,6 @@ private:
 
 	static void internelReadCallback(struct bufferevent* bev, void* ctx)
 	{
-		printf("Read Callback Invoked\r\n");
 		BlockingSocket * socket = (BlockingSocket *)ctx;
 		pthread_cond_broadcast(&socket->_rcond);
 	}
@@ -156,18 +172,21 @@ private:
 
 	static void  internelEventCallback(struct bufferevent* bev, int16_t events, void* ctx)
 	{
-		printf("got callback %d\n", events);
+		BlockingSocket * socket = (BlockingSocket*)ctx;
+		//printf("got callback %d\n", events);
 		if (events & BEV_EVENT_CONNECTED) {
 			printf("CONNECTED\n");
 		}
 		if (events & BEV_EVENT_EOF) {
 			printf("EOF\n");
+			socket->_connected = 0;
 		}
 		if (events & BEV_EVENT_TIMEOUT) {
 			printf("TIMEOUT\n");
 		}
 		if (events & BEV_EVENT_ERROR) {
-			printf("ERROR %d\n", evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
+			socket->_connected = 0;
+			printf("ERROR %s\n", evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
 		}
 		if (events & BEV_EVENT_READING) {
 			printf("READING\n");
