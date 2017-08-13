@@ -130,7 +130,11 @@
     <ClCompile Include="src\SQLConnectionPool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AsyncSocket.h" />
     <ClInclude Include="include\AuthServer.h" />
+    <ClInclude Include="include\BlockingSocket.h" />
+    <ClInclude Include="include\EventBase.h" />
+    <ClInclude Include="include\MessageQueue.h" />
     <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\public\Runnable.h" />
     <ClInclude Include="include\public\Thread.h" />

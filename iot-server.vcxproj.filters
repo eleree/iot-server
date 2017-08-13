@@ -77,5 +77,17 @@
     <ClInclude Include="include\TCPClient.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\AsyncSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockingSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EventBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MessageQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

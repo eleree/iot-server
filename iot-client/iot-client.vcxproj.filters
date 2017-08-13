@@ -30,5 +30,11 @@
     <ClCompile Include="..\lib\json\json_writer.cpp">
       <Filter>资源文件\jsoncpp</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\public\Runnable.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\public\Thread.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

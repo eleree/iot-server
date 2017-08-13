@@ -29,7 +29,7 @@ public:
 		setTimeout(&_readTimeout, timeout);
 		bufferevent_set_timeouts(_conn, &_readTimeout, &_writeTimeout);
 		bufferevent_setcb(_conn, conn_readcb, conn_writecb, conn_eventcb, this);
-
+		
 	}
 
 	~TCPClient() {
