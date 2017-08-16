@@ -20,6 +20,7 @@
 #include "TCPClient.h"
 #include "EventBase.h"
 #include "BlockingSocket.h"
+#include <asio.hpp>
 using namespace std;
 class TestClass
 {
@@ -40,6 +41,7 @@ public:
 	~TestClass() {}
 };
 
+using namespace asio;
 
 int main(void)
 {
